@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <ctype.h>
+
+#define MAX_QUESTIONS 3
+#define MAX_OPTIONS 4
+#define MAX_QUESTION_LENGTH 100
+#define MAX_OPTION_LENGTH 100
+
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+    }
+}
+
+void saveResultsToFile(const char *name, int score, int numberOfQuestions)
+{
+    FILE *file = fopen("quiz_results.txt", "a");
+    if (file == NULL)
+    {
+        printf("Error opening file.\n");
+        return;
+    }
+
+    fprintf(file, "Name: %s\n", name);
+    fprintf(file, "Final Score: %d/%d\n\n", score, numberOfQuestions);
+    fclose(file);
+}
+
+int main()
+{
+    char questions[MAX_QUESTIONS][MAX_QUESTION_LENGTH] = {
+        "1. What year did the C language debut?: ",
+        "2. Who is credited with creating C?: ",
+        "3. What is the predecessor of C?: "};
+
+    char options[MAX_QUESTIONS][MAX_OPTIONS][MAX_OPTION_LENGTH] = {
+        {"A. 1969", "B. 1972", "C. 1975", "D. 1999"},
+        {"A. Dennis Ritchie", "B. Nikola Tesla", "C. John Carmack", "D. Doc Brown"},
+        {"A. Objective C", "B. B", "C. C++", "D. C#"}};
+
+    char answers[MAX_QUESTIONS] = {'B', 'A', 'B'};
+    int numberOfQuestions = sizeof(questions) / sizeof(questions[0]);
+
+    char guess = ' ';
+    int score = 0;
+    char name[100];
+
+    printf("QUIZ GAME\n");
+    printf("Enter your name: ");
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = '\0';  // Remove trailing newline character
+
+    for (int i = 0; i < numberOfQuestions; i++)
+    {
+        printf("*\n");
+        printf("%s\n", questions[i]);
+        printf("*\n");
+
+        for (int j = 0; j < MAX_OPTIONS; j++)
+        {
+            printf("%s\n", options[i][j]);
+        }
+
+        printf("guess: ");
+        scanf(" %c", &guess);
+        clearInputBuffer();
+
+        guess = toupper(guess);
+
+        if (guess == answers[i])
+        {
+            printf("CORRECT!\n");
+            score++;
+        }
+        else
+        {
+            printf("WRONG!\n");
+        }
+    }
+
+    printf("*\n");
+    printf("FINAL SCORE: %d/%d\n", score, numberOfQuestions);
+    printf("*\n");
+
+    saveResultsToFile(name, score, numberOfQuestions);
+
+    return 0;
+}
